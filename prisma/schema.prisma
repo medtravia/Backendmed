@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum NotificationStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+model TreatmentInquiry {
+  id                        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  legacyId                  Int?               @unique @map("legacy_id")
+  fullName                  String             @map("full_name") @db.VarChar(150)
+  country                   String             @db.VarChar(100)
+  mobileNumber              String             @map("mobile_number") @db.VarChar(30)
+  email                     String             @db.VarChar(255)
+  treatment                 String             @db.VarChar(150)
+  preferredDestination      String             @map("preferred_destination") @db.VarChar(150)
+  message                   String             @db.Text
+  notificationStatus        NotificationStatus @default(PENDING) @map("notification_status")
+  notificationAttempts      Int                @default(0) @map("notification_attempts")
+  notificationMessageId     String?            @map("notification_message_id") @db.VarChar(255)
+  notificationSentAt        DateTime?          @map("notification_sent_at")
+  notificationLastError     String?            @map("notification_last_error") @db.VarChar(1000)
+  notificationClaimedAt     DateTime?          @map("notification_claimed_at")
+  notificationClaimToken    String?            @map("notification_claim_token") @db.Uuid
+  nextNotificationAttemptAt DateTime?          @default(now()) @map("next_notification_attempt_at")
+  idempotencyKey            String?            @unique @map("idempotency_key") @db.VarChar(128)
+  requestFingerprint        String?            @map("request_fingerprint") @db.Char(64)
+  createdAt                 DateTime           @default(now()) @map("created_at")
+  updatedAt                 DateTime           @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([notificationStatus, nextNotificationAttemptAt])
+  @@map("treatment_inquiries")
+}
+
+model Admin {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  legacyId     Int?      @unique @map("legacy_id")
+  name         String    @db.VarChar(100)
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model RateLimitBucket {
+  key       String   @id @db.VarChar(255)
+  totalHits Int      @map("total_hits")
+  resetAt   DateTime @map("reset_at")
+
+  @@index([resetAt])
+  @@map("rate_limit_buckets")
+}
