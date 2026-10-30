@@ -7,7 +7,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "dev": "node server.js --host 0.0.0.0",
+    "dev": "node server.js ",
     "start": "node server.js",
     "test": "node --test",
     "prisma:generate": "prisma generate",
