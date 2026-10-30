@@ -6,13 +6,10 @@
   "author": "",
   "type": "module",
   "main": "server.js",
-  "engines": {
-    "node": ">=20.19 <21 || >=22.12 <23 || >=24"
-  },
   "scripts": {
-    "dev": "nodemon server.js",
+    "dev": "node server.js --host 0.0.0.0",
     "start": "node server.js",
-    "test": "node --test --test-concurrency=1",
+    "test": "node --test",
     "prisma:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
